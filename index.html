@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Contribuez à l'IA Africaine Responsable</title>
+</head>
+<body>
+    <div class="header">
+        <img src="assets/images/logo_enspd.jpeg" alt="Logo ENSPD">
+        <img src="assets/images/logo_club.jpeg" alt="Logo du Club">
+        <p>
+            Ensemble, enrichissons notre compréhension de l'IA avec les réalités africaines.
+            Votre contribution est essentielle pour bâtir une IA qui nous ressemble et répond à nos besoins spécifiques.
+            Partagez vos images et aidez-nous dans cette mission cruciale.
+        </p>
+    </div>
+
+    <div class="form-container">
+        <h1>Partagez Vos Images</h1>
+        <p style="text-align: center; color: #6c757d; margin-bottom: 20px;">
+            Votre contribution aide à construire une base de données riche et pertinente pour l'IA africaine.
+        </p>
+        <form id="uploadForm">
+            <label for="nature-image">Nature de l'image <span style="color: red;">*</span></label>
+            <select name="nature-image" id="nature-image" required>
+                <option value="" disabled selected>Sélectionnez la nature</option>
+                <option value="végétale">Végétale</option>
+                <option value="animal">Animal</option>
+                <option value="humain">Humain</option>
+                <option value="objet">Objet</option>
+            </select>
+
+            <label for="nom-image">Nom de l'image <span style="color: red;">*</span></label>
+            <input type="text" name="nom-image" id="nom-image" placeholder="Décrivez brièvement l'image" required>
+
+            <label for="image-file">Choisissez un fichier image <span style="color: red;">*</span></label>
+            <input type="file" name="image-file" id="image-file" accept="image/*" required>
+            <small style="display: block; margin-top: 5px; color: #777;">Formats acceptés: JPG, JPEG, PNG, GIF (max. 5 Mo)</small>
+
+            <button type="submit">Envoyer l'image</button>
+        </form>
+        <div id="uploadStatus"></div>
+    </div>
+
+    <div class="footer">
+        <p>Contactez-nous : <a href="mailto:contact@club.com" style="color: white;">contact@club.com</a></p>
+        <div class="social-icons">
+            <a href="#" title="Rejoignez-nous sur Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.linkedin.com/groups/13122802" title="Connectez-vous sur LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" title="Discutez avec nous sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        <p style="font-size: 0.8em; margin-top: 10px;">Ensemble pour une IA africaine pertinente et éthique.</p>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const natureImage = document.getElementById('nature-image').value;
+            const nomImage = document.getElementById('nom-image').value;
+            const imageFile = document.getElementById('image-file').files[0];
+            const uploadStatus = document.getElementById('uploadStatus');
+
+            if (!natureImage || !nomImage || !imageFile) {
+                uploadStatus.textContent = '⚠️ Veuillez remplir tous les champs.';
+                uploadStatus.className = 'error';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('nature-image', natureImage);
+            formData.append('nom-image', nomImage);
+            formData.append('image-file', imageFile);
+
+            uploadStatus.textContent = '⏳ Envoi en cours...';
+            uploadStatus.className = '';
+
+            fetch('https://your-firebase-cloud-function-url', { // Remplacez par l'URL de votre Cloud Function
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    uploadStatus.textContent = '✅ Enregistrement réussi !';
+                    uploadStatus.className = 'success';
+                    if (confirm('Souhaitez-vous ajouter une autre image ?')) {
+                        document.getElementById('uploadForm').reset();
+                        uploadStatus.textContent = '';
+                    } else {
+                        alert('👍 Merci pour votre contribution !');
+                        // Redirection facultative
+                        // window.location.href = 'remerciements.html';
+                    }
+                } else {
+                    uploadStatus.textContent = '❌ Erreur : ' + data.error;
+                    uploadStatus.className = 'error';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'envoi de la requête :', error);
+                uploadStatus.textContent = '😭 Une erreur inattendue s\'est produite.';
+                uploadStatus.className = 'error';
+            });
+        });
+    </script>
+</body>
+</html>
